@@ -241,7 +241,7 @@ class TextToSpeech:
 
     def __init__(
         self,
-        model_path,
+        model_path=None,
         autoregressive_batch_size=None,
         models_dir=MODELS_DIR,
         enable_redaction=True,
@@ -306,7 +306,16 @@ class TextToSpeech:
                 .cpu()
                 .eval()
             )
-            self.autoregressive.load_state_dict(torch.load(model_path), strict=False)
+            # change path here
+            self.model_path = (
+                get_model_path("autoregressive.pth", models_dir)
+                if model_path is None
+                else model_path
+            )
+            self.autoregressive.load_state_dict(
+                torch.load(self.model_path),
+                strict=False,
+            )
             self.autoregressive.post_init_gpt2_config(
                 use_deepspeed=use_deepspeed, kv_cache=kv_cache, half=self.half
             )
